@@ -1,0 +1,25 @@
+# Ignore structural folders.
+config/
+inputs/
+outputs/
+assets/
+reference/
+annotation/
+extra/
+tmp/
+
+# Ignore other minor folders.
+packs/
+MELTv2.1.4/
+bowtie2-2.3.4.1/
+Pyton-2.7.15/
+Pyton-3.7.0/
+STAR/
+bedtools2/
+
+# Ignore some files.
+*.log
+*.swp
+*.yml
+
+timestamp*
