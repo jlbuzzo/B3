@@ -79,6 +79,7 @@ help:
 	$(ECHO) "\tOptions:"
 	$(ECHO) "\t\t-f\tSpecify a Makefile with another name."
 	$(ECHO) "\t\t-s\tSilent mode."
+	$(ECHO) "\t\t-j\tPropagate parallelism to sub-makes. This is serial only."
 	$(ECHO) "\t\tARGS\tSpecify extra arguments (ex. ARGS=\"arg1 arg2 ...\")."
 	$(ECHO) "\t\tCONFIG\tSpecify configuration file to parse (ex. CONFIG=\"my_config.mk\")."
 	$(ECHO) "\t\tDBG\tDebug messages (ex. DBG=yes)."
@@ -91,9 +92,10 @@ simple_test:
 
 
 
-# Main targetis chain.
+# All Makefile is serial, but recursive the ones can be parallelized.
 .NOTPARALLEL:
 
+# Main targetis chain.
 all: target3
 	$(ECHO) "All done.\n"
 

@@ -23,7 +23,7 @@ DEFAULT_USER	:= lion
 
 
 # Host's base directory, outside the container: $(PWD).
-prefix :=		$(PWD)
+prefix :=		$(PWD)#$(PWD)/pocket
 H_BASE_d		:= $(prefix)
 H_CONFIG_d		:= $(H_BASE_d)/config
 H_INPUTS_d		:= $(H_BASE_d)/inputs
@@ -64,14 +64,24 @@ MP_TMP_l		:=
 
 
 # General pipeline data: name and file suffixes.
-PIPELINE 		:= CUSTOM
-SUFFIXES 		:= .bam
+PIPELINE 			:= CUSTOM
+SUFFIXES 			:=
 
 
 
-# Hypertargets.
-TARGET0			:= ponga
-TARGET0_REQUISITES :=
-TARGET2			:= B3
-TARGET2_REQUISITES := extra
-TARGET2_RECIPES := ls -l
+# Meta-targets.
+TARGET3				:=
+TARGET3_REQUISITES	:=
+TARGET3_RECIPES		:=
+
+TARGET2				:=
+TARGET2_REQUISITES	:=
+TARGET2_RECIPES		:=
+
+TARGET1				:=
+TARGET1_REQUISITES	:=
+TARGET1_RECIPES		:=
+
+TARGET0				:=
+TARGET0_REQUISITES	:=
+TARGET0_RECIPES		:=
