@@ -1,5 +1,5 @@
 #!/usr/bin/make
-################################################################################
+############################## HEADER ##########################################
 # Makefile for docker stuff...
 ################################################################################
 
@@ -12,7 +12,7 @@
 # Command macros.
 SHELL				:= bash
 MODULE_NAME			:= docker
-#CALL				:= "[$(MODULE_NAME): $(shell date --utc)]"
+#CALL				:= [$(MODULE_NAME): $(shell date --utc)]
 ECHO				:= echo -e
 MKDIR				:= mkdir -p
 PING				:= ping -c1
@@ -78,7 +78,7 @@ EXTRA_d			:= $(if $(SWITCH),$(C_EXTRA_d),$(H_EXTRA_d))
 TMP_d			:= $(if $(SWITCH),$(C_TMP_d),$(H_TMP_d))
 
 # All directories.
-DIRS_dl			:= $(CONFIG_d) $(INPUTS_d) $(OUTPUTS_d) $(ASSETS_d) $(REFERENCE_d) $(ANNOTATION_d) $(EXTRA_d) $(TMP_d)
+DIRS_dl			:= $(BASE_d) $(CONFIG_d) $(INPUTS_d) $(OUTPUTS_d) $(ASSETS_d) $(REFERENCE_d) $(ANNOTATION_d) $(EXTRA_d) $(TMP_d)
 
 
 # Docker specific variables. Tarball v18.06.
@@ -87,11 +87,6 @@ IMAGE				?=
 DOCKERFILE			?= $(BASE_d)/Dockerfile
 DOCKER_TARBALL		?= $(TMP_d)/docker-18.06.1-ce.tgz
 DOCKER_TARBALL_URL	?= https://download.docker.com/linux/static/stable/x86_64/docker-18.06.1-ce.tgz
-
-
-# Essential arguments pre-validations.
-$(if $(strip $(IMAGE)),, $(error "Docker image undefined!"))
-include $(if $(strip $(CONFIG)),$(CONFIG), $(error "Configuration file undefined!"))
 
 
 # Mount some important files in their respective folders. Must use absolute paths!
@@ -111,18 +106,28 @@ STEM_l			:= CONFIG INPUTS OUTPUTS ASSETS REFERENCE ANNOTATION EXTRA TMP
 
 ############################## ENVIRONMENT TESTS ###############################
 
+# Essential arguments pre-validations.
+CONFIG				?= config.mk
+include $(if $(shell [ -e "$(CONFIG)" ] && echo "1"),$(CONFIG),$(error "Configuration file is missing"))
+$(if $(strip $(IMAGE)),, $(error "Docker image undefined!"))
+
+
 # Conditional commands.
-HAS_INTERNET := read <<< "$$($(PING) www.google.com)" && echo -n $$REPLY
-GET_INTERNET := $(if $(shell $(HAS_INTERNET)),,internet_configure)
+HAS_INTERNET		:= read <<< "$$($(PING) www.google.com)" && echo -n $$REPLY
+GET_INTERNET		:= $(if $(shell $(HAS_INTERNET)),,internet_configure)
 
-HAS_DOCKER := if [ -n "$$(which docker)" ]; then echo "1"; fi
-GET_DOCKER := $(if $(shell $(HAS_DOCKER)),,docker_install)
+HAS_DOCKER			:= if [ -n "$$(which docker)" ]; then echo "1"; fi
+GET_DOCKER			:= $(if $(shell $(HAS_DOCKER)),,docker_install)
 
-HAS_DOCKERFILE := if [ -f "$(DOCKERFILE)" ]; then echo "1"; fi
-GET_MODE := $(if $(shell $(HAS_DOCKERFILE)),docker_build,docker_pull)
+HAS_DOCKERFILE		:= if [ -f "$(DOCKERFILE)" ]; then echo "1"; fi
+GET_MODE			:= $(if $(shell $(HAS_DOCKERFILE)),docker_build,docker_pull)
 
-HAS_IMAGE := echo -n "$$(sed -n '\:^$(IMAGE) :{p}' <<< "$$(docker images 2> /dev/null)")"
-GET_IMAGE := $(if $(shell $(HAS_IMAGE)),,$(GET_MODE))
+HAS_IMAGE			:= echo -n "$$(sed -n '\:^$(IMAGE) :{p}' <<< "$$(docker images 2> /dev/null)")"
+GET_IMAGE			:= $(if $(shell $(HAS_IMAGE)),,$(GET_MODE))
+
+
+# Export all variables or not.
+export
 
 
 
@@ -130,7 +135,6 @@ GET_IMAGE := $(if $(shell $(HAS_IMAGE)),,$(GET_MODE))
 
 # Debug code.
 ifeq ($(DBG),yes)
-
 $(info "############################## DEBUG ###########################################")
 $(info )
 
@@ -186,6 +190,8 @@ $(info )
 
 $(info STEM_l:$(STEM_l).)
 $(info MAPS_l:$(MAPS_l).)
+$(info )
+
 $(info "################################################################################")
 $(info )
 endif
@@ -200,18 +206,24 @@ endif
 
 ############################## TARGETS #########################################
 
-# Help must be the first target or the default goal.
+# Help must be the first target, the default goal.
 help: 
 	$(ECHO) "Usage:\n"
-		$(ECHO) "\tmake -f my_Makefile IMAGE=my_image ARGS=\"arg1 arg2\" [options] all"
+	$(ECHO) "\tmake -f my_Makefile IMAGE=my_image ARGS=\"arg1 arg2\" [options] all"
 
 
-all: docker_run
-	$(ECHO) "All done.\n"
+# This is a default testing target.
+simple_test:
+	$(ECHO) "This is a simple test for arguments:$(ARGS)."
 
 
 
 # Routine targets.
+all: docker_run
+	$(ECHO) "All done.\n"
+
+
+# Run in Docker.
 docker_run: has_docker_image $(DIRS_dl)#$(CONFIG)
 	$(ECHO) "Run docker image $(IMAGE)..."
 	$(DOCKER_RUN) \
@@ -287,10 +299,6 @@ $(DIRS_dl):
 	$(MKDIR) $@
 	$(ECHO) "Done.\n"
 
-
-# This is a default testing target.
-simple_test:
-	$(ECHO) "This is a simple test for arguments:$(ARGS)."
 
 
 

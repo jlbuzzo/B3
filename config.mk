@@ -66,3 +66,12 @@ MP_TMP_l		:=
 # General pipeline data: name and file suffixes.
 PIPELINE 		:= CUSTOM
 SUFFIXES 		:= .bam
+
+
+
+# Hypertargets.
+TARGET0			:= ponga
+TARGET0_REQUISITES :=
+TARGET2			:= B3
+TARGET2_REQUISITES := extra
+TARGET2_RECIPES := ls -l
